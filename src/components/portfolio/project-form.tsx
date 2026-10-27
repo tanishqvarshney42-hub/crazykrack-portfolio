@@ -43,7 +43,7 @@ export function ProjectForm() {
       {select('budget', 'Budget range (USD)', BUDGETS)}
       {field('deadline', 'Deadline', input('deadline', 'text', 'e.g. November 15, or flexible'))}
       {field('reference', 'Reference link', input('reference', 'url', 'https://…', 500), true)}
-      <div className="sm:col-span-2">{field('details', 'Project details', <Textarea id="brief-details" name="details" rows={5} maxLength={2500} className="brief-input h-auto min-h-32 resize-y" placeholder="What are you creating? Share the goal, style, footage and scope." aria-required="true" aria-invalid={!!errors.details} aria-describedby={errors.details ? 'error-details' : undefined} />)}</div>
+      <div className="sm:col-span-2">{field('details', 'Project details', <Textarea id="brief-details" name="details" rows={5} maxLength={2500} className="brief-input h-auto min-h-32 resize-y" placeholder="What are you creating? Share the goal, style, footage and scope." aria-required="true" aria-invalid={!!errors['details']} aria-describedby={errors['details'] ? 'error-details' : undefined} />)}</div>
     </div>
     <Button type="submit" size="lg" className="mt-6 h-12 w-full rounded-xl">Prepare project email <ArrowUpRight /></Button>
     <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">Your email app will open with your brief. Review it and send when ready.<br />Nothing is sent or stored by this website.</p>
