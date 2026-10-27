@@ -1,176 +1,119 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, ArrowUpRight, Play, Clapperboard, AudioLines, Scissors, Layers, Menu, X, Mail, Copy, Check, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ProjectForm } from '@/components/portfolio/project-form';
+import { VIDEOS, FILTERS, thumb, embed, EMAIL, DISCORD, type Video } from '@/lib/portfolio';
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "CrazyKrack — Video Editor Portfolio" },
-      { name: "description", content: "CrazyKrack edits Minecraft, Roblox, Fortnite, vlog, IRL gaming and business videos with strong pacing, sound design and retention." },
-      { property: "og:title", content: "CrazyKrack — Videos that make people stay." },
-      { property: "og:description", content: "Video editing focused on storytelling, pacing, sound design and retention." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+export const Route = createFileRoute('/')({
+  head: () => ({ meta: [
+    { title: 'CrazyKrack — Video Editor for Creators & Brands' },
+    { name: 'description', content: 'Story-driven video editing for creators and brands. Explore 12 gaming, vlog and business samples, and start a project with CrazyKrack.' },
+    { property: 'og:title', content: 'CrazyKrack — Video Editor for Creators & Brands' },
+    { property: 'og:description', content: 'Sharp hooks. Intentional pacing. Stories worth watching. Explore the work and share your next video project.' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ] }),
   component: Index,
 });
 
-type Cat = "Roblox" | "Minecraft" | "Vlog" | "Business" | "IRL Game" | "Fortnite";
-type Video = { id: string; cat: Cat; yt?: boolean };
-
-const VIDEOS: Video[] = [
-  { id: "1IA007oPmuwiJZTf_V0omyJHpTqDYbmL-", cat: "Minecraft" },
-  { id: "1V7LX2KYjlp8XZ707g6D-eBb81j-0GYBj", cat: "Minecraft" },
-  { id: "1OTrgvi49DHt97nVHEw7EcdwyhLRDAuqa", cat: "Minecraft" },
-  { id: "15WLHKHZMgXe3l_ipoE_HYjAIlDyo_nPc", cat: "Minecraft" },
-  { id: "1AS1XuIN4giXJhNEg0DkaSaYgwyxTHfq1", cat: "Minecraft" },
-  { id: "GVTeMVqFJzI", cat: "Roblox", yt: true },
-  { id: "1yzU_ZpqUaSzOgGGNn2EFVgJ_271t1J21", cat: "Vlog" },
-  { id: "1iGEYcnFHQn_Dnb8vnV42QmEXSZYCFQ_J", cat: "IRL Game" },
-  { id: "16agkwkqhdy6j7krimkpBeOL2tW1EihIa", cat: "Fortnite" },
-  { id: "1QGTHENrttWjYKPO_-3z_ML-v1uPtsIOY", cat: "Business" },
-  { id: "17uclJyku9thvRQa3rhjTWGxHBUv14QSS", cat: "Business" },
-  { id: "1qdv2jBxViXFuQ--ZgS8qgRduFBr1pDAK", cat: "Business" },
-];
-const FILTERS = ["All", "Roblox", "Minecraft", "Vlog", "Business", "IRL Game", "Fortnite"] as const;
-
-const thumb = (v: Video) =>
-  v.yt ? `https://img.youtube.com/vi/${v.id}/hqdefault.jpg` : `https://drive.google.com/thumbnail?id=${v.id}&sz=w1200`;
-const embed = (v: Video) =>
-  v.yt ? `https://www.youtube.com/embed/${v.id}?autoplay=1` : `https://drive.google.com/file/d/${v.id}/preview`;
-
-const EMAIL = "tanishqvarshney42@gmail.com";
-const DISCORD = "https://discord.com/users/crzykrackz22";
-
 const SERVICES = [
-  { t: "Gaming Edits", d: "Minecraft, Roblox, Fortnite and IRL gaming videos cut for energy, humor and replay value." },
-  { t: "Storytelling & Pacing", d: "Strong hooks, tight structure and rhythm that keeps viewers watching to the end." },
-  { t: "Sound Design", d: "SFX, music timing and clean audio that make every moment land harder." },
-  { t: "Vlogs & Business", d: "Clear, polished edits for vlogs, brands and creators that communicate fast." },
+  { title: 'Gaming & creator edits', text: 'High-energy cuts, well-timed humor and a story that carries the action. Minecraft, Roblox, Fortnite and IRL gaming.', icon: Clapperboard },
+  { title: 'Storytelling & pacing', text: 'A compelling opening, a clear narrative and room for the moments that matter. Every cut has a reason.', icon: Scissors },
+  { title: 'Sound design', text: 'Clean dialogue, considered music and precise sound effects that bring rhythm and impact to your footage.', icon: AudioLines },
+  { title: 'Vlogs & brand content', text: 'Personality-led vlogs and polished business videos that communicate clearly without losing the human touch.', icon: Layers },
 ];
+
+function Counter({ value, label }: { value: number; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [count, setCount] = useState(value);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let frame = 0;
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      observer.disconnect();
+      const start = performance.now();
+      const tick = (now: number) => { const progress = Math.min((now - start) / 1000, 1); setCount(Math.round(value * (1 - Math.pow(1 - progress, 3)))); if (progress < 1) frame = requestAnimationFrame(tick); };
+      frame = requestAnimationFrame(tick);
+    }, { threshold: 0.5 });
+    observer.observe(node);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
+  }, [value]);
+  return <div ref={ref} className="stat-card glass rounded-2xl"><span aria-hidden="true" className="font-display text-4xl font-semibold text-foreground">{count.toString().padStart(2, '0')}<span className="text-primary">.</span></span><span className="sr-only">{value}</span><span className="text-sm text-muted-foreground">{label}</span></div>;
+}
 
 function Index() {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All');
   const [active, setActive] = useState<Video | null>(null);
-  const list = useMemo(() => (filter === "All" ? VIDEOS : VIDEOS.filter((v) => v.cat === filter)), [filter]);
-
+  const [menu, setMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
+  const list = filter === 'All' ? VIDEOS : VIDEOS.filter(video => video.cat === filter);
   useEffect(() => {
-    if (!active) return;
-    const k = (e: KeyboardEvent) => e.key === "Escape" && setActive(null);
-    window.addEventListener("keydown", k);
-    document.body.style.overflow = "hidden";
-    return () => { window.removeEventListener("keydown", k); document.body.style.overflow = ""; };
-  }, [active]);
-
-  const first = (c: Cat) => VIDEOS.find((v) => v.cat === c)!;
-
-  return (
-    <div className="min-h-screen">
-      <header className="sticky top-4 z-40 mx-auto mt-4 w-[calc(100%-2rem)] max-w-5xl">
-        <nav className="glass flex items-center justify-between rounded-full px-5 py-3">
-          <a href="#top" className="font-display text-lg font-bold">Crazy<span className="text-primary">Krack</span></a>
-          <div className="hidden gap-6 text-sm text-muted-foreground sm:flex">
-            {["Work", "Services", "About", "Contact"].map((s) => (
-              <a key={s} href={`#${s.toLowerCase()}`} className="transition-colors hover:text-foreground">{s}</a>
-            ))}
-          </div>
-          <a href="#contact" className="bg-gradient-primary rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground">Hire me</a>
-        </nav>
-      </header>
-
-      <main id="top" className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="py-24 text-center sm:py-32">
-          <span className="glass inline-block rounded-full px-4 py-1.5 text-xs uppercase tracking-widest text-primary-glow">Video Editor</span>
-          <h1 className="text-gradient mx-auto mt-6 max-w-4xl text-5xl font-bold leading-[1.05] sm:text-7xl">Videos that make people stay.</h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            I edit with intention — sharp hooks, engaging storytelling, tight pacing and sound design built to hold attention and boost retention.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <a href="#work" className="bg-gradient-primary shadow-glow rounded-full px-7 py-3 font-semibold text-primary-foreground transition-transform hover:scale-105">View my work</a>
-            <a href="#contact" className="glass rounded-full px-7 py-3 font-semibold transition-colors hover:bg-accent">Let's talk</a>
-          </div>
-        </section>
-
-        <section id="work" className="scroll-mt-28 py-16">
-          <h2 className="text-3xl font-bold sm:text-4xl">Selected <span className="text-primary">Work</span></h2>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {FILTERS.map((f) => (
-              <button key={f} onClick={() => setFilter(f)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${filter === f ? "bg-gradient-primary shadow-glow text-primary-foreground" : "glass text-muted-foreground hover:text-foreground"}`}>
-                {f}
-              </button>
-            ))}
-          </div>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((v) => (
-              <article key={v.id} className="glass group overflow-hidden rounded-3xl transition-transform hover:-translate-y-1">
-                <div className="relative aspect-video overflow-hidden bg-muted">
-                  <img src={thumb(v)} alt={`${v.cat} edit thumbnail`} loading="lazy" referrerPolicy="no-referrer"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                </div>
-                <div className="flex items-center justify-between p-4">
-                  <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-primary-glow">{v.cat}</span>
-                  <button onClick={() => setActive(v)} className="bg-gradient-primary rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground">▶ Preview</button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="services" className="scroll-mt-28 py-16">
-          <h2 className="text-3xl font-bold sm:text-4xl">What I <span className="text-primary">do</span></h2>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2">
-            {SERVICES.map((s, i) => (
-              <div key={s.t} className="glass rounded-3xl p-7">
-                <div className="bg-gradient-primary grid h-10 w-10 place-items-center rounded-2xl font-bold text-primary-foreground">{i + 1}</div>
-                <h3 className="mt-4 text-xl font-semibold">{s.t}</h3>
-                <p className="mt-2 text-muted-foreground">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="about" className="scroll-mt-28 py-16">
-          <div className="glass rounded-[2rem] p-8 sm:p-12">
-            <h2 className="text-3xl font-bold sm:text-4xl">About <span className="text-primary">me</span></h2>
-            <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
-              <p>I'm CrazyKrack, a video editor who turns raw footage into engaging stories. From Minecraft and Roblox to vlogs, IRL gaming, Fortnite, and business content, I focus on clean cuts, strong pacing, sound design, and moments that keep viewers watching.</p>
-              <p>I believe every video needs more than effects. It needs rhythm, clarity, and a story worth staying for.</p>
-              <p className="text-foreground">If you’re looking for an editor who cares about the details from the first hook to the final cut, let’s work together.</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="scroll-mt-28 py-16 pb-32 text-center">
-          <h2 className="text-gradient text-4xl font-bold sm:text-5xl">Let's make your next video stick.</h2>
-          <p className="mt-4 text-muted-foreground">Reach out by email or Discord.</p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href={`mailto:${EMAIL}`} className="bg-gradient-primary shadow-glow break-all rounded-full px-6 py-3 font-semibold text-primary-foreground">✉ {EMAIL}</a>
-            <a href={DISCORD} target="_blank" rel="noreferrer" className="glass rounded-full px-6 py-3 font-semibold hover:bg-accent">Discord · crzykrackz22</a>
-          </div>
-        </section>
-      </main>
-
-      <footer className="pb-24 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} CrazyKrack</footer>
-
-      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-2">
-        <button onClick={() => setActive(first("Minecraft"))} className="glass shadow-glow rounded-full px-4 py-2.5 text-sm font-semibold hover:bg-accent">▶ Minecraft</button>
-        <button onClick={() => setActive(first("Roblox"))} className="bg-gradient-primary shadow-glow rounded-full px-4 py-2.5 text-sm font-semibold text-primary-foreground">▶ Roblox</button>
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+    }), { threshold: 0.08 });
+    document.querySelectorAll('[data-reveal]').forEach(node => { node.classList.add('reveal-ready'); observer.observe(node); });
+    return () => observer.disconnect();
+  }, []);
+  async function copyDiscord() {
+    try { await navigator.clipboard.writeText('crzykrackz22'); setCopied(true); setCopyFailed(false); }
+    catch { setCopyFailed(true); }
+  }
+  return <div id="top" className="relative min-h-screen overflow-x-clip">
+    <div className="ambient-mesh" aria-hidden="true" />
+    <header className="site-header sticky top-0 z-40">
+      <div className="page-width flex h-20 items-center justify-between gap-4">
+        <a href="#top" aria-label="CrazyKrack home" className="flex items-center gap-2.5 font-display text-lg font-bold"><span className="brand-mark"><Scissors size={18} /></span>Crazy<span className="-ml-2 text-primary-glow">Krack</span><span className="text-primary">.</span></a>
+        <nav aria-label="Main navigation" className="hidden items-center gap-7 md:flex">{['Work', 'Services', 'About', 'Contact'].map(s => <a className="nav-link" key={s} href={`#${s.toLowerCase()}`}>{s}</a>)}</nav>
+        <div className="flex items-center gap-2"><Button asChild className="hidden rounded-full sm:inline-flex"><a href="#contact">Start a Project <ArrowUpRight /></a></Button><Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMenu(!menu)} aria-label={menu ? 'Close navigation' : 'Open navigation'} aria-expanded={menu}>{menu ? <X /> : <Menu />}</Button></div>
       </div>
-
-      {active && (
-        <div className="bg-overlay fixed inset-0 z-50 grid place-items-center p-4 backdrop-blur-md animate-in fade-in" onClick={() => setActive(null)}>
-          <div className="glass w-full max-w-4xl overflow-hidden rounded-3xl animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-5 py-3">
-              <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-primary-glow">{active.cat}</span>
-              <button onClick={() => setActive(null)} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full hover:bg-accent">✕</button>
-            </div>
-            <div className="aspect-video bg-background">
-              <iframe key={active.id} src={embed(active)} className="h-full w-full" allow="autoplay; encrypted-media; fullscreen" allowFullScreen title={`${active.cat} video`} />
-            </div>
+      {menu && <nav aria-label="Mobile navigation" className="page-width flex flex-col gap-1 border-t border-border py-4 md:hidden">{['Work', 'Services', 'About', 'Contact'].map(s => <Button key={s} asChild variant="ghost" className="justify-start"><a href={`#${s.toLowerCase()}`} onClick={() => setMenu(false)}>{s}</a></Button>)}</nav>}
+    </header>
+    <main>
+      <section className="hero relative">
+        <div className="hero-grid" aria-hidden="true" />
+        <div className="page-width relative text-center">
+          <p className="eyebrow justify-center"><span className="status-dot" /> VIDEO EDITOR FOR CREATORS & BRANDS</p>
+          <h1 className="mx-auto mt-7 max-w-5xl font-display text-5xl font-semibold leading-[1.13] sm:text-6xl lg:text-7xl">Your story.<br /><span className="text-gradient">Impossible to skip.</span></h1>
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">I’m CrazyKrack. I turn raw footage into videos that make people stay — with sharp hooks, intentional pacing and sound that hits.</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3"><Button asChild size="lg" className="h-12 rounded-full shadow-glow"><a href="#work"><Play size={16} fill="currentColor" /> View Work</a></Button><Button asChild variant="outline" size="lg" className="h-12 rounded-full bg-background/30"><a href="#contact">Start a Project <ArrowUpRight /></a></Button></div>
+          <p className="mt-7 text-xs text-muted-foreground">Gaming · Vlogs · Business · Stories worth watching</p>
+          <div className="hero-reel mt-10 sm:mt-12" aria-label="Featured video samples">
+            {[VIDEOS[0], VIDEOS[5], VIDEOS[8]].filter((v): v is Video => !!v).map(video => <Button key={video.id} variant="ghost" onClick={() => setActive(video)} className="reel-frame group relative h-auto overflow-hidden rounded-xl p-0" aria-label={`Preview featured ${video.cat} video`}><img src={thumb(video)} alt={`${video.cat} video sample`} referrerPolicy="no-referrer" className="h-full w-full object-cover" /><span className="reel-shade" /><span className="absolute bottom-3 left-4 text-xs font-semibold text-primary-foreground">{video.cat}</span><span className="play-circle absolute right-3 bottom-3"><Play size={14} fill="currentColor" /></span></Button>)}
           </div>
+          <a href="#work" className="mx-auto mt-7 flex w-fit items-center gap-2 text-xs text-muted-foreground">Explore the work <ArrowDown size={14} /></a>
         </div>
-      )}
-    </div>
-  );
+      </section>
+
+      <section id="work" className="section-band page-width">
+        <div data-reveal className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="eyebrow">01 / THE PORTFOLIO</p><h2 className="section-title mt-3">The work speaks.</h2></div><p className="max-w-sm text-sm leading-relaxed text-muted-foreground">Different worlds. The same attention to detail.<br />A selection of gaming, creator and brand edits.</p></div>
+        <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter videos by category">{FILTERS.map(f => <Button key={f} onClick={() => setFilter(f)} variant={filter === f ? 'default' : 'outline'} aria-pressed={filter === f} className={`h-10 rounded-full px-4 ${filter === f ? 'shadow-glow' : 'bg-transparent text-muted-foreground'}`}>{f}{f === 'All' && <span className="ml-1 text-xs opacity-70">12</span>}</Button>)}</div>
+        <p aria-live="polite" className="mt-5 text-xs text-muted-foreground">{list.length} {list.length === 1 ? 'sample' : 'samples'} · {filter === 'All' ? 'All categories' : filter}</p>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{list.map((video, index) => <article key={video.id} className="work-card glass group overflow-hidden rounded-2xl">
+          <Button variant="ghost" onClick={() => setActive(video)} className="relative block aspect-video h-auto w-full overflow-hidden rounded-none p-0" aria-label={`Preview ${video.cat} sample ${index + 1}`}><img src={thumb(video)} alt={`${video.cat} edit thumbnail`} loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /><span className="thumbnail-shade" /><span className="play-circle thumbnail-play"><Play size={19} fill="currentColor" /></span></Button>
+          <div className="flex items-center justify-between px-5 py-4"><span className="category-tag">{video.cat}</span><Button variant="ghost" onClick={() => setActive(video)} className="h-8 px-0 text-xs text-foreground">Preview <ArrowUpRight /></Button></div>
+        </article>)}</div>
+        {list.length === 0 && <div className="py-20 text-center"><Clapperboard className="mx-auto mb-4 text-muted-foreground" /><h3 className="text-xl">No samples in this category yet.</h3><Button variant="link" onClick={() => setFilter('All')}>View all work <ArrowUpRight /></Button></div>}
+      </section>
+
+      <section className="attention-band section-band"><div className="page-width grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+        <div data-reveal><p className="eyebrow">MORE THAN A CLEAN CUT</p><h2 className="section-title mt-3">Editing built<br />for <span className="text-primary-glow">attention.</span></h2><p className="mt-5 max-w-md text-sm leading-relaxed text-muted-foreground">The click gets someone in. The edit gives them a reason to stay. I focus on the experience from the first frame to the final beat.</p><div className="mt-8 grid max-w-md grid-cols-2 gap-4"><Counter value={VIDEOS.length} label="Video samples" /><Counter value={FILTERS.length - 1} label="Content categories" /></div></div>
+        <div data-reveal><div className="space-y-0">{[['01', 'A hook with a purpose', 'Establish the story early and give viewers a reason to keep watching.'], ['02', 'Pacing that feels right', 'Cut the dead time, build momentum and let important moments breathe.'], ['03', 'Sound & story in sync', 'Use dialogue, music and sound design to guide the emotion of the edit.']].map(([n,t,d]) => <div key={n} className="flex gap-5 border-b border-border py-5 first:pt-0"><span className="pt-1 font-mono text-xs text-primary">{n}</span><div><h3 className="text-lg font-semibold">{t}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p></div></div>)}</div><p className="mt-5 border-l-2 border-primary/50 pl-4 text-xs leading-relaxed text-muted-foreground">CTR is mainly influenced by your title, thumbnail and packaging. Editing supports watch time and retention — it doesn’t guarantee more clicks or specific results.</p></div>
+      </div></section>
+
+      <section id="services" className="section-band page-width"><div data-reveal><p className="eyebrow">02 / THE CRAFT</p><h2 className="section-title mt-3">Your footage. A better finish.</h2></div><div className="mt-9 grid gap-5 sm:grid-cols-2">{SERVICES.map((service, i) => <article data-reveal key={service.title} className="service-card glass rounded-2xl p-7"><div className="flex items-center justify-between"><span className="service-icon"><service.icon size={23} /></span><span className="font-mono text-xs text-muted-foreground">0{i + 1}</span></div><h3 className="mt-6 text-xl font-semibold">{service.title}</h3><p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">{service.text}</p></article>)}</div></section>
+
+      <section id="about" className="section-band border-y border-border"><div data-reveal className="page-width grid gap-10 lg:grid-cols-[1fr_1.1fr]"><div><p className="eyebrow">03 / BEHIND THE EDIT</p><h2 className="section-title mt-3">Hey, I’m<br /><span className="text-primary-glow">CrazyKrack.</span></h2><p className="mt-5 text-sm text-muted-foreground">The detail-oriented editor behind the timeline.</p><div className="mt-7 flex items-center gap-3 text-muted-foreground"><Scissors size={18} /><span className="text-xs">Thoughtful cuts. Clear stories. Human connection.</span></div></div><div className="space-y-5 text-base leading-relaxed text-muted-foreground"><p>I turn raw footage into engaging stories for creators and brands. From Minecraft and Roblox to vlogs, IRL gaming, Fortnite and business content, my focus is on clean cuts, strong pacing and moments that keep viewers watching.</p><p>I believe every video needs more than effects. It needs rhythm, clarity and a story worth staying for.</p><p className="text-foreground">If you want an editor who cares about the details from the first hook to the final cut, let’s work together.</p><Button asChild variant="link" className="h-auto px-0 text-primary-glow"><a href="#contact">Tell me what you’re creating <ArrowUpRight /></a></Button></div></div></section>
+
+      <section id="contact" className="section-band page-width"><div className="grid items-start gap-12 lg:grid-cols-[0.8fr_1.2fr]"><div data-reveal className="lg:sticky lg:top-28"><p className="eyebrow">04 / LET’S COLLABORATE</p><h2 className="section-title mt-3">Start a<br /><span className="text-gradient">great project.</span></h2><p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">Have footage ready or an idea taking shape? Share a little about your project, and let’s find the right direction.</p><div className="mt-8 space-y-6"><div><p className="mb-2 text-xs text-muted-foreground">PREFER EMAIL?</p><a href={`mailto:${EMAIL}`} className="contact-email flex items-center gap-2 text-sm font-medium hover:text-primary-glow"><Mail size={17} className="shrink-0" /><span className="break-all">{EMAIL}</span><ArrowUpRight size={16} className="shrink-0" /></a></div><div><p className="mb-2 text-xs text-muted-foreground">LET’S TALK ON DISCORD</p><div className="flex items-center gap-2"><Button asChild variant="outline" className="rounded-full"><a href={DISCORD} target="_blank" rel="noreferrer"><MessageCircle /> crzykrackz22 <ArrowUpRight /></a></Button><Button variant="ghost" size="icon" title="Copy Discord username" aria-label="Copy Discord username" onClick={copyDiscord}>{copied ? <Check /> : <Copy />}</Button></div><p aria-live="polite" className="mt-2 text-xs text-muted-foreground">{copied ? 'Username copied — add me in Discord.' : copyFailed ? 'Copy unavailable. Add crzykrackz22 in Discord.' : 'Add crzykrackz22 as a friend in Discord.'}</p></div></div></div><ProjectForm /></div></section>
+    </main>
+    <footer className="border-t border-border pb-28 pt-8 sm:pb-24"><div className="page-width flex flex-col justify-between gap-5 sm:flex-row sm:items-center"><div><a href="#top" className="font-display text-base font-semibold">CrazyKrack<span className="text-primary">.</span></a><p className="mt-2 text-xs text-muted-foreground">© {new Date().getFullYear()} CrazyKrack. All rights reserved.</p></div><nav aria-label="Footer navigation" className="flex flex-wrap gap-5 text-xs text-muted-foreground">{['Work', 'Services', 'About', 'Contact'].map(s => <a key={s} href={`#${s.toLowerCase()}`} className="hover:text-foreground">{s}</a>)}</nav><a href="#top" className="flex items-center gap-2 text-xs text-muted-foreground">Back to top <ArrowUpRight size={14} /></a></div></footer>
+    <div className="floating-previews fixed bottom-4 right-4 z-30 flex gap-2 rounded-full border border-glass-border bg-popover/95 p-2 shadow-glow backdrop-blur-xl sm:bottom-6 sm:right-6"><Button onClick={() => setActive(VIDEOS.find(v => v.cat === 'Minecraft') ?? null)} variant="ghost" className="rounded-full text-xs"><Play size={13} fill="currentColor" /> Minecraft</Button><Button onClick={() => setActive(VIDEOS.find(v => v.cat === 'Roblox') ?? null)} className="rounded-full text-xs"><Play size={13} fill="currentColor" /> Roblox</Button></div>
+    <Dialog open={!!active} onOpenChange={open => { if (!open) setActive(null); }}><DialogContent className="video-dialog w-[calc(100%-2rem)] max-w-4xl overflow-hidden rounded-2xl border-glass-border bg-card p-0"><div className="px-5 py-4 pr-12"><DialogTitle className="text-base">{active?.cat} <span className="font-normal text-muted-foreground">/ Video preview</span></DialogTitle><DialogDescription className="sr-only">Watch the selected portfolio video.</DialogDescription></div>{active && <div className="aspect-video bg-background"><iframe key={active.id} src={embed(active)} className="h-full w-full" allow="autoplay; encrypted-media; fullscreen" allowFullScreen title={`${active.cat} video`} /></div>}</DialogContent></Dialog>
+  </div>;
 }
