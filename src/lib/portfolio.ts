@@ -8,6 +8,7 @@ export const VIDEOS: Video[] = [
   { id: "15WLHKHZMgXe3l_ipoE_HYjAIlDyo_nPc", cat: "Minecraft" },
   { id: "1AS1XuIN4giXJhNEg0DkaSaYgwyxTHfq1", cat: "Minecraft" },
   { id: "GVTeMVqFJzI", cat: "Roblox", yt: true },
+  { id: "6-AOe_Lnvp0", cat: "Roblox", yt: true },
   { id: "1yzU_ZpqUaSzOgGGNn2EFVgJ_271t1J21", cat: "Vlog" },
   { id: "1iGEYcnFHQn_Dnb8vnV42QmEXSZYCFQ_J", cat: "IRL Game" },
   { id: "16agkwkqhdy6j7krimkpBeOL2tW1EihIa", cat: "Fortnite" },
