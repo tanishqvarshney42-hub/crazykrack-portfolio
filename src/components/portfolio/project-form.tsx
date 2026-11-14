@@ -32,7 +32,7 @@ export function ProjectForm() {
     return field(name, label, <Select value={choices[name] || ''} onValueChange={value => setChoices(c => ({ ...c, [name]: value }))}><SelectTrigger id={`brief-${name}`} className="brief-input" aria-required="true" aria-invalid={!!errors[name]} aria-describedby={errors[name] ? `error-${name}` : undefined}><SelectValue placeholder="Select an option" /></SelectTrigger><SelectContent>{options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select>);
   }
   const input = (name: string, type: string, placeholder: string, maxLength = 100) => <Input className="brief-input" id={`brief-${name}`} name={name} type={type} placeholder={placeholder} maxLength={maxLength} aria-required={name !== 'reference'} aria-invalid={!!errors[name]} aria-describedby={errors[name] ? `error-${name}` : undefined} autoComplete={name === 'name' || name === 'email' ? name : undefined} />;
-  return <form onSubmit={submit} noValidate className="project-form glass rounded-2xl p-6 sm:p-9">
+  return <form onSubmit={submit} noValidate className="project-form glass rounded-[2rem] p-6 sm:p-9">
     <div className="mb-7 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><Mail size={19} /></span><h3 className="text-xl font-semibold">Your project brief</h3></div>
     <div className="grid gap-5 sm:grid-cols-2">
       {field('name', 'Your name', input('name', 'text', 'Full name'))}
