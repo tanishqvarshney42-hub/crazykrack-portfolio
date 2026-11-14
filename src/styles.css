@@ -193,4 +193,68 @@
   *,*::before,*::after { animation: none !important; transition: none !important; }
   .reveal-ready { opacity: 1; transform: none; }
   .hero-object,.hero-brand,.glass-heading,.work-card,.service-card,.stat-card,.attention-pod,.about-pod,.contact-pod,.project-form { animation: none !important; }
+  
+}
+
+/* SKETCH PAPER THEME */
+:root {
+  --background: #f7f5ef;
+  --foreground: #171717;
+  --card: #fffefa;
+  --popover: #fffefa;
+  --primary: #222222;
+  --primary-glow: #444444;
+  --primary-foreground: #ffffff;
+  --secondary: #e9e6dd;
+  --muted: #e9e6dd;
+  --muted-foreground: #66645e;
+  --accent: #e9e6dd;
+  --border: #242321;
+  --input: #aaa69d;
+  --glass: #fffefa;
+  --glass-border: #242321;
+  --overlay: #171717;
+  --gradient-text: none;
+  --gradient-mesh: none;
+  --shadow-glow: 3px 3px 0 #242321;
+  --mesh-blue: transparent;
+  --mesh-purple: transparent;
+}
+
+body {
+  background: #f7f5ef !important;
+  color: #171717 !important;
+}
+
+.ambient-mesh {
+  display: none !important;
+}
+
+.glass, .glass-pill, .nav-capsule,
+.project-form, .floating-previews {
+  background: #fffefa !important;
+  backdrop-filter: none !important;
+  border: 2px solid #242321 !important;
+  box-shadow: 4px 4px 0 #242321 !important;
+}
+
+.work-card, .service-card, .stat-card,
+.hero-object, .glass-heading {
+  border: 2px solid #242321 !important;
+  box-shadow: 4px 4px 0 #242321 !important;
+}
+
+.text-gradient {
+  background: none !important;
+  color: #171717 !important;
+}
+
+.category-tag {
+  color: #171717 !important;
+  border: 1px solid #242321 !important;
+  background: #f0eee6 !important;
+}
+
+img {
+  filter: none !important;
 }
